@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -7,16 +8,22 @@ public class Main {
         int inputPerceptronCount;
         int[] hiddenPerceptronCount;
         int outputPerceptronCount;
+        float learningRate;
 
         //set perception's activation function
-        System.out.println("Please Enter the number of the desired activation function\n" +
-                "1: Linear\n" +
-                "2: ReLU\n" +
-                "3: Leaky ReLU\n" +
-                "4: Sigmoid\n" +
-                "5: Tanh\n" +
-                ">>>");
+        System.out.println("""
+                Please Enter the number of the desired activation function
+                1: Linear
+                2: ReLU
+                3: Leaky ReLU
+                4: Sigmoid
+                5: Tanh
+                >>>""");
         activationFunctionType = scanner.nextInt();
+
+        //set learning rate
+        System.out.println("Please enter learning rate (float)");
+        learningRate = scanner.nextFloat();
 
         //make inputLayer's perceptron
         System.out.println("Please enter the number of input Perceptron >>>");
@@ -34,6 +41,6 @@ public class Main {
         System.out.println("Please enter the number of output Perceptron >>>");
         outputPerceptronCount = scanner.nextInt();
 
-        Net net = new Net(activationFunctionType, inputPerceptronCount, hiddenPerceptronCount, outputPerceptronCount);
+        Net net = new Net(activationFunctionType, learningRate, inputPerceptronCount, hiddenPerceptronCount, outputPerceptronCount, new ArrayList<Float>()/*todo - input*/, new ArrayList<Float>()/*todo - target output*/);
     }
 }

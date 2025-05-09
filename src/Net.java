@@ -1,47 +1,58 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
-
 public class Net {
-    Scanner scanner = new Scanner(System.in);
-
-    Perceptron[] inputLayer;
-    int inputPerceptronCount;
-
-    ArrayList<Perceptron>[] hiddenLayers;
-    int hiddenLayerCount;
-    int hiddenPerceptronCount;
-
-    Perceptron[] outputLayer;
-    int outputPerceptronCount;
-
-    Net(int functionType, int inputPerceptronCount, int[] hiddenPerceptronCount, int outputPerceptronCount) {
+    ArrayList<Perceptron>[] perceptronNet;
+    ArrayList<Float> inputValue = new ArrayList<>();
+    ArrayList<Float> outputValue = new ArrayList<>();
+    ArrayList<Float> targetOutputValue = new ArrayList<>();
+    Net(int functionType, float learningRate, int inputPerceptronCount, int[] hiddenPerceptronCount, int outputPerceptronCount, ArrayList<Float> inputValue, ArrayList<Float> targetOutputValue) {
+        perceptronNet = new ArrayList[1 + hiddenPerceptronCount.length + 1]; //input, hiddens, output
         Perceptron.functionType = functionType;
+        Perceptron.learningRate = learningRate;
+        Perceptron.bias = 0.5F;
 
-        inputLayer = new Perceptron[inputPerceptronCount];
-        for(int i = 1; i <= inputPerceptronCount; i++) {
-            inputLayer[i-1] = new Perceptron();
+        for (int i = 0; i <= perceptronNet.length-1; i++) {//initializer
+            perceptronNet[i] = new ArrayList<>();
         }
 
-        hiddenLayers = new ArrayList[hiddenLayerCount];
-        for(ArrayList hiddenLayer : hiddenLayers) {
-            for (int PerceptronCount : hiddenPerceptronCount) {
-                for(int i=0; i<= PerceptronCount; i++) {
-                    hiddenLayer.add(new Perceptron());
+        for (int i = 0; i <= inputPerceptronCount-1; i++) { //make input layer
+            perceptronNet[0].add(new Perceptron(1,hiddenPerceptronCount[0]));
+        }
+
+        for (int i = 0; i <= hiddenPerceptronCount.length-1; i++) { //make hidden layer
+            for (int j = 0; j <= hiddenPerceptronCount[i]; j++) {
+                if (i == hiddenPerceptronCount.length-1) {
+                    perceptronNet[i+1].add(new Perceptron(hiddenPerceptronCount[i], outputPerceptronCount));
+                } else {
+                    perceptronNet[i+1].add(new Perceptron(hiddenPerceptronCount[i], hiddenPerceptronCount[i + 1]));
                 }
             }
         }
 
-        outputLayer = new Perceptron[outputPerceptronCount];
-        for (int i = 1; i <= outputPerceptronCount; i++) {
-            outputLayer[i-1] = new Perceptron();
+        for(int i = 0; i <= outputPerceptronCount-1; i++) { //make input layer
+            perceptronNet[inputPerceptronCount + hiddenPerceptronCount.length -1 ].add(new Perceptron(outputPerceptronCount, 1)); //last-1
         }
 
     }
-
+    void transmission () {
+        for (int i = 0; i < perceptronNet.length; i++) {
+            for (Perceptron perceptron : perceptronNet[i]) {
+                if (i == 0) {
+                    for (float input : inputValue) {
+                        perceptron.setInput(input);
+                    }
+                }else if (i < perceptronNet.length-1) {
+                    for (int j = 0; j < perceptronNet[i+1].size(); i++) {
+                        perceptronNet[i+1].get(j).setInput(perceptron.getOutput().get(j));
+                    }
+                } else {
+                    outputValue.add(perceptron.output);
+                }
+            }
+        }
+    }
     void activate() {
-        for(int i = 1; i <= inputPerceptronCount; i++) {
-
+        for (ArrayList<Perceptron> layer : perceptronNet) {
+            transmission();
         }
     }
 }
