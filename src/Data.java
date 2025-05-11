@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 
 public class Data {
-    Data(Float data) {
-        element.add(data);
+    Float[] element;
+    Data(Float[] data) {
+        element = data;
     }
-    ArrayList<Float> element = new ArrayList<>();
-    ArrayList<Float> getElement() {
+
+    Float[] getElement() {
         return element;
     }
 }

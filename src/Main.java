@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -9,6 +11,8 @@ public class Main {
         int[] hiddenPerceptronCount;
         int outputPerceptronCount;
         float learningRate;
+        Data dummyInputData = new Data(new Float[]{5F, 4F});
+        Data dummyTargetData = new Data(new Float[]{1F});
 
         //set perception's activation function
         System.out.println("""
@@ -32,15 +36,17 @@ public class Main {
         //make hiddenLayer
         System.out.println("Please enter the number of hidden layers >>>");
         hiddenPerceptronCount = new int[scanner.nextInt()];
-        for(int PerceptronCount : hiddenPerceptronCount) {
+        for(int i = 0; i <= hiddenPerceptronCount.length-1; i++) {
             System.out.println("Please enter the number of perceptron of hidden layer");
-            PerceptronCount = scanner.nextInt();
+            hiddenPerceptronCount[i] = scanner.nextInt();
         }
 
         //make outputLayer's perceptron
         System.out.println("Please enter the number of output Perceptron >>>");
         outputPerceptronCount = scanner.nextInt();
 
-        Net net = new Net(activationFunctionType, learningRate, inputPerceptronCount, hiddenPerceptronCount, outputPerceptronCount, new ArrayList<Float>()/*todo - input*/, new ArrayList<Float>()/*todo - target output*/);
+        Net net = new Net(activationFunctionType, learningRate, inputPerceptronCount, hiddenPerceptronCount, outputPerceptronCount, new ArrayList<Float>(List.of(dummyInputData.getElement())), new ArrayList<Float>(List.of(dummyTargetData.getElement())));
+        net.activate();
+        net.printResult();
     }
 }

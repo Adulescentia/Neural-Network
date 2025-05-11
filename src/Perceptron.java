@@ -1,53 +1,66 @@
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
+interface ActivationFunction {
+    float apply(float x);
+}
 public class Perceptron {
     Random random = new Random();
     static int functionType;
+    private final ActivationFunction activationFunction;
     static float learningRate;
     static float bias;
     float output;
     ArrayList<Float> inputList;
-    ArrayList<Float> weightedOutputList;
+    ArrayList<Float> calculatedOutputList;
     ArrayList<Float> weightList;
-    Perceptron (int inputCount, int outputCount) {
+    Perceptron (int inputCount, int outputCount,boolean isOutputLayer) {
         inputList = new ArrayList<>();
-        weightedOutputList = new ArrayList<>();
+        calculatedOutputList = new ArrayList<>();
         weightList = new ArrayList<>();
-        for (int i = 0; i < outputCount; i ++) { //weight initializing
-            // TO-DO 각 활성화 함수에 맞는 초기화 함수 사용 https://wikidocs.net/259052  - 현재는 He initializing
-            weightList.add(random.nextFloat((float) (2* Math.sqrt((double) 6 /inputCount)))); //일단은 ReLU 용
+        if (!isOutputLayer) {
+            for (int i = 0; i < outputCount; i++) { //weight initializing
+                // TO-DO 각 활성화 함수에 맞는 초기화 함수 사용 https://wikidocs.net/259052  - 현재는 He initializing
+                weightList.add((float) (random.nextDouble((2 * Math.sqrt((double) 6 / inputCount))) - Math.sqrt((double) 6 / inputCount))); //일단은 ReLU 용
+            }
+        } else {
+            for (int i = 0; i < outputCount; i++) {
+                weightList.add(1F);
+            }
         }
+        this.activationFunction = selectActivationFunction(functionType);
     }
     void calculate () {
         output = 0;
-        for (float input : inputList) {
-            output += input;
-        }
+        for (float input : inputList) { output += input; }
         output -= bias;
-        for (float weight : weightList) {
-            weightedOutputList.add(output*weight);
-        }
+        for (float weight : weightList) { calculatedOutputList.add(activate(output*weight)); }
     }
 
     ArrayList<Float> getOutput () {
-        return weightedOutputList;
+        calculate();
+        for(Float c : calculatedOutputList) {
+            System.out.println(c);
+        }
+        return calculatedOutputList;
     }
 
     void setInput (float inputValue) {
         inputList.add(inputValue);
     }
 
-
-    float activate (float value) { //activation function
+    private ActivationFunction selectActivationFunction(int functionType) {
         return switch (functionType) {
-            case 1 -> value;                                // 1:linear
-            case 2 -> Math.max(0,value);                    // 2:ReLU
-            case 3 -> (float) Math.max(0.1*value,value);    // 3:leaky ReLU
-            case 4 -> (float) (1/(1+Math.exp(-value)));     // 4:sigmoid
-            case 5 -> (float) Math.tanh(value);             // 5:tanh
-            default -> throw new IllegalStateException("Unexpected value: " + functionType);
+            case 1 -> (x -> x); //linear
+            case 2 -> (x -> Math.max(0, x)); //ReLU
+            case 3 -> (x -> Math.max(0.1f * x, x)); //Leaky_ReLU
+            case 4 -> (x -> (float) (1 / (1 + Math.exp(-x)))); //sigmoid
+            case 5 -> (x -> (float) Math.tanh(x)); //tanh
+            default -> throw new IllegalArgumentException("Invalid function type: " + functionType);
         };
+    }
+    public float activate(float value) {
+        return activationFunction.apply(value);
     }
 }
