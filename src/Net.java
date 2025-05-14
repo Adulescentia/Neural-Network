@@ -4,6 +4,10 @@ public class Net {
     ArrayList<Float> inputValue;
     ArrayList<Float> outputValue = new ArrayList<>();
     ArrayList<Float> targetOutputValue;
+    ArrayList<Float> errorSignal = new ArrayList<>();
+    ArrayList<Float> weightOfWeight = new ArrayList<>();
+    ArrayList<Float>[] errorGradient;
+    int epoch = 0;
     Net(int functionType, float learningRate, int inputPerceptronCount, int[] hiddenPerceptronCount, int outputPerceptronCount, ArrayList<Float> inputValue, ArrayList<Float> targetOutputValue) {
         perceptronNet = new ArrayList[1 + hiddenPerceptronCount.length + 1]; //input, hiddens, output
         Perceptron.functionType = functionType;
@@ -11,6 +15,7 @@ public class Net {
         Perceptron.bias = 0.5F;
         this.inputValue = inputValue;
         this.targetOutputValue = targetOutputValue;
+        errorGradient = new ArrayList[1 + hiddenPerceptronCount.length + 1];
 
 
         for (int i = 0; i <= perceptronNet.length-1; i++) {//initializer
@@ -53,10 +58,31 @@ public class Net {
             }
         }
     }
-    void activate() {
-        transmission();
+
+    void updateErrorGradient() {
+        //todo
+    }
+    void updateErrorSignal() {
+        for(int i = 0; i<=perceptronNet[perceptronNet.length-1].size()-1; i++) {
+            errorSignal.add(targetOutputValue.get(i) - outputValue.get(i));
+        }
     }
 
+    void activate() {
+        transmission();
+        updateErrorSignal();
+        updateWeight();
+        epoch++;
+    }
+
+    void updateWeight() {
+        //Todo weightOfWeight set
+        for(ArrayList<Perceptron> layer : perceptronNet) {
+            for(Perceptron perceptron : layer) {
+                perceptron.updateWeight(weightOfWeight);
+            }
+        }
+    }
     void printResult() {
         System.out.print("Target output is:");
         for (Float targetOutput : targetOutputValue) {

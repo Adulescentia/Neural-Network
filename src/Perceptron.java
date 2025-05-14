@@ -13,9 +13,11 @@ public class Perceptron {
     static float bias;
     float output;
     ArrayList<Float> inputList;
+    float sumOfInputs = 0;
     ArrayList<Float> calculatedOutputList;
     ArrayList<Float> weightList;
-    Perceptron (int inputCount, int outputCount,boolean isOutputLayer) {
+
+    Perceptron(int inputCount, int outputCount, boolean isOutputLayer) {
         inputList = new ArrayList<>();
         calculatedOutputList = new ArrayList<>();
         weightList = new ArrayList<>();
@@ -31,22 +33,27 @@ public class Perceptron {
         }
         this.activationFunction = selectActivationFunction(functionType);
     }
-    void calculate () {
+
+    void calculate() {
         output = 0;
-        for (float input : inputList) { output += input; }
+        for (float input : inputList) {
+            output += input;
+        }
         output -= bias;
-        for (float weight : weightList) { calculatedOutputList.add(activate(output*weight)); }
+        for (float weight : weightList) {
+            calculatedOutputList.add(activate(output * weight));
+        }
     }
 
-    ArrayList<Float> getOutput () {
+    ArrayList<Float> getOutput() {
         calculate();
-        for(Float c : calculatedOutputList) {
+        for (Float c : calculatedOutputList) {
             System.out.println(c);
         }
         return calculatedOutputList;
     }
 
-    void setInput (float inputValue) {
+    void setInput(float inputValue) {
         inputList.add(inputValue);
     }
 
@@ -59,6 +66,18 @@ public class Perceptron {
             case 5 -> (x -> (float) Math.tanh(x)); //tanh
             default -> throw new IllegalArgumentException("Invalid function type: " + functionType);
         };
+    }
+
+    float getSumOfInputs() {
+        for (float input : inputList) {
+            sumOfInputs += input;
+        }
+        return sumOfInputs;
+    }
+    void updateWeight(ArrayList<Float> weightOfWeight) {
+        for(int i = 0; i <= weightList.size()-1; i++) {
+            weightList.set(i,weightList.get(i) + weightOfWeight.get(i));
+        }
     }
     public float activate(float value) {
         return activationFunction.apply(value);
