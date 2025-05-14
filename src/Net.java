@@ -5,8 +5,9 @@ public class Net {
     ArrayList<Float> outputValue = new ArrayList<>();
     ArrayList<Float> targetOutputValue;
     ArrayList<Float> errorSignal = new ArrayList<>();
+    ArrayList<Float> weightOfOutputLayerWeight = new ArrayList<>();
     ArrayList<Float> weightOfWeight = new ArrayList<>();
-    ArrayList<Float>[] errorGradient;
+    ArrayList<Float> outputLayerErrorGradient;
     int epoch = 0;
     Net(int functionType, float learningRate, int inputPerceptronCount, int[] hiddenPerceptronCount, int outputPerceptronCount, ArrayList<Float> inputValue, ArrayList<Float> targetOutputValue) {
         perceptronNet = new ArrayList[1 + hiddenPerceptronCount.length + 1]; //input, hiddens, output
@@ -15,7 +16,7 @@ public class Net {
         Perceptron.bias = 0.5F;
         this.inputValue = inputValue;
         this.targetOutputValue = targetOutputValue;
-        errorGradient = new ArrayList[1 + hiddenPerceptronCount.length + 1];
+        outputLayerErrorGradient = new ArrayList<Float>();
 
 
         for (int i = 0; i <= perceptronNet.length-1; i++) {//initializer
@@ -59,8 +60,10 @@ public class Net {
         }
     }
 
-    void updateErrorGradient() {
-        //todo
+    void updateOutputLayerErrorGradient() {
+        for(int i = 0; i<=perceptronNet[perceptronNet.length-1].size()-1; i++) {
+            outputLayerErrorGradient.add((float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1].get(i).sumOfInputs))*(1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1].get(i).sumOfInputs))))*errorSignal.get(i)));
+        }
     }
     void updateErrorSignal() {
         for(int i = 0; i<=perceptronNet[perceptronNet.length-1].size()-1; i++) {
@@ -71,15 +74,16 @@ public class Net {
     void activate() {
         transmission();
         updateErrorSignal();
-        updateWeight();
+        updateOutputLayerErrorGradient();
+        updateOutputLayerWeight();
         epoch++;
     }
 
-    void updateWeight() {
+    void updateOutputLayerWeight() {
         //Todo weightOfWeight set
         for(ArrayList<Perceptron> layer : perceptronNet) {
             for(Perceptron perceptron : layer) {
-                perceptron.updateWeight(weightOfWeight);
+                perceptron.updateWeight(weightOfOutputLayerWeight);
             }
         }
     }
