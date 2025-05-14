@@ -10,7 +10,7 @@ public class Perceptron {
     static int functionType;
     private final ActivationFunction activationFunction;
     static float learningRate;
-    static float bias;
+    float bias;
     float output;
     ArrayList<Float> inputList;
     float sumOfInputs = 0;
