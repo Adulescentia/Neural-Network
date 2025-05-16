@@ -49,7 +49,7 @@ public class Perceptron {
         calculate();
         for (Float c : calculatedOutputList) {
             System.out.println(c);
-        }
+         }
         return calculatedOutputList;
     }
 

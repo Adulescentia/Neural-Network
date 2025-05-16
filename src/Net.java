@@ -7,8 +7,7 @@ public class Net {
     ArrayList<Float> targetOutputValue;
 
     ArrayList<Float> errorSignal;
-    ArrayList<Float> outputLayerErrorGradient;
-    ArrayList<Float>[] weightOfOutputLayerWeight;
+    ArrayList<Float>[] errorGradient;
     ArrayList<ArrayList<Float>>[] weightOfWeight;
 
     Float sumOfTheSquaredErrors;
@@ -25,15 +24,14 @@ public class Net {
         this.targetOutputValue = targetOutputValue;
 
         errorSignal = new ArrayList<>();
-        outputLayerErrorGradient = new ArrayList<>();
-        weightOfOutputLayerWeight = new ArrayList[hiddenPerceptronCount[hiddenPerceptronCount.length-2]];
+        errorGradient = new ArrayList[hiddenPerceptronCount.length+1];
         weightOfWeight = new ArrayList[1 + hiddenPerceptronCount.length-1]; //input, hidden
 
-        for (int i = 0; i <= perceptronNet.length-2; i++) {//initializer - weight
+        for (int i = 0; i <= perceptronNet.length-2; i++) {//initializer of weight
             weightOfWeight[i] = new ArrayList<>();
         }
 
-        for (int i = 0; i <= perceptronNet.length-1; i++) {//initializer - net
+        for (int i = 0; i <= perceptronNet.length-1; i++) {//initializer of net
             perceptronNet[i] = new ArrayList<>();
         }
 
@@ -82,18 +80,18 @@ public class Net {
 
     void updateOutputLayerErrorGradient() {
         for(int i = 0; i<=perceptronNet[perceptronNet.length-1].size()-1; i++) {
-            outputLayerErrorGradient.add((float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1].get(i).sumOfInputs))*(1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1].get(i).sumOfInputs))))*errorSignal.get(i)));
+            errorGradient[perceptronNet.length-2].add((float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1].get(i).sumOfInputs))*(1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1].get(i).sumOfInputs))))*errorSignal.get(i)));
         }
     }
 
     void updateOutputLayerWeight() {
         for(int i = 0; i<=perceptronNet[perceptronNet.length-2].size()-1; i++) {
             for(int j = 0; i<= perceptronNet[perceptronNet.length-1].size()-1; i++) {
-                weightOfOutputLayerWeight[i].add(Perceptron.learningRate * perceptronNet[perceptronNet.length - 2].get(i).output * outputLayerErrorGradient.get(j));
+                weightOfWeight[perceptronNet.length-2].get(i).add(Perceptron.learningRate * perceptronNet[perceptronNet.length - 2].get(i).output * errorGradient[perceptronNet.length-2].get(j));
             }
         }
         for(int i = 0; i<=perceptronNet[perceptronNet.length-2].size()-1; i++) {
-            perceptronNet[perceptronNet.length-2].get(i).updateWeight(weightOfOutputLayerWeight[i]);
+            perceptronNet[perceptronNet.length-2].get(i).updateWeight(weightOfWeight[perceptronNet.length-2].get(i));
         }
 
     }
