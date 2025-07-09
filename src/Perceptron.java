@@ -74,9 +74,9 @@ public class Perceptron {
         }
         return sumOfInputs;
     }
-    void updateWeight(ArrayList<Float> weightOfWeight) {
+    void updateWeight(float[] weightOfWeight) {
         for(int i = 0; i <= weightList.size()-1; i++) {
-            weightList.set(i,weightList.get(i) + weightOfWeight.get(i));
+            weightList.set(i,weightList.get(i) + weightOfWeight[i]);
         }
     }
     public float activate(float value) {
