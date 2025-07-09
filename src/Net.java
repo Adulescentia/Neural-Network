@@ -65,7 +65,7 @@ public class Net {
     }
 
 
-    void transmission () {
+    void transmission () { //??????????? wtf
         for (int i = 0; i < perceptronNet.length; i++) {
             for (Perceptron perceptron : perceptronNet[i]) {
                 if (i == 0) {
@@ -77,13 +77,21 @@ public class Net {
                         perceptronNet[i+1][j].setInput(perceptron.getOutput().get(j));
                     }
                 } else {
-                    outputValue = perceptron.getOutput();
+                    for (int j = 0; j <= perceptronNet[i].length; j++) {
+                        outputValue.addAll(perceptron.getOutput());
+                    }
                 }
             }
         }
     }
 
     void updateErrorSignal() {
+        for (float i : outputValue) {
+            System.out.println(i);
+        }
+        for (float i : targetOutputValue) {
+            System.out.println(i);
+        }
         for(int i = 0; i<=perceptronNet[perceptronNet.length-1].length-1; i++) {
             errorSignal.add(targetOutputValue.get(i) - outputValue.get(i));
         }
@@ -91,7 +99,9 @@ public class Net {
 
     void updateOutputLayerErrorGradient() {
         for(int i = 0; i<=perceptronNet[perceptronNet.length-1].length-1; i++) {
-            errorGradient[perceptronNet.length-2].add((float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))*(1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))))*errorSignal.get(i)));
+            errorGradient[perceptronNet.length-2].add(
+                    (float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))*
+                    (1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))))*errorSignal.get(i)));
         }
     }
 
