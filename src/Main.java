@@ -11,7 +11,7 @@ public class Main {
         int[] hiddenPerceptronCount;
         int outputPerceptronCount;
         float learningRate;
-        Data dummyInputData = new Data(new Float[]{5F, 4F});
+        Data dummyInputData = new Data(new Float[]{0F, 1F});
         Data dummyTargetData = new Data(new Float[]{1F});
 
         //set perception's activation function

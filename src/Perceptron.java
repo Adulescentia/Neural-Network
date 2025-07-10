@@ -41,6 +41,7 @@ public class Perceptron {
         }
         output -= bias;
         for (float weight : weightList) {
+            System.out.println(activate(output * weight));
             calculatedOutputList.add(activate(output * weight));
         }
     }

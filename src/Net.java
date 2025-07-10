@@ -37,19 +37,25 @@ public class Net {
         //make hidden layers
         for (int i = 0; i <= hiddenPerceptronCount.length-1; i++) {
             perceptronNet[i+1] = new Perceptron[hiddenPerceptronCount[i]];
-            for (int j = 0; j <= hiddenPerceptronCount[i]-1; j++) {
-                if (i == 0) {
-                    perceptronNet[i+1][j] = new Perceptron(inputPerceptronCount, hiddenPerceptronCount[i + 1], false);
-                } else if (i == hiddenPerceptronCount.length-1){
-                    perceptronNet[i+1][j] = new Perceptron(hiddenPerceptronCount[i - 1], outputPerceptronCount, false);
-                } else {
-                    perceptronNet[i+1][j] = new Perceptron(hiddenPerceptronCount[i - 1], hiddenPerceptronCount[i + 1], false);
+            if (perceptronNet.length == 3) {
+                for (int j = 0; j <= hiddenPerceptronCount[i] - 1; j++) {
+                    perceptronNet[i + 1][j] = new Perceptron(inputPerceptronCount, outputPerceptronCount, false);
+                }
+            } else {
+                for (int j = 0; j <= hiddenPerceptronCount[i] - 1; j++) {
+                    if (i == 0) {
+                        perceptronNet[i + 1][j] = new Perceptron(inputPerceptronCount, hiddenPerceptronCount[i + 1], false);
+                    } else if (i == hiddenPerceptronCount.length - 1) {
+                        perceptronNet[i + 1][j] = new Perceptron(hiddenPerceptronCount[i - 1], outputPerceptronCount, false);
+                    } else {
+                        perceptronNet[i + 1][j] = new Perceptron(hiddenPerceptronCount[i - 1], hiddenPerceptronCount[i + 1], false);
+                    }
                 }
             }
         }
 
         //make output layer
-        perceptronNet[perceptronNet.length - 1] = new Perceptron[inputPerceptronCount];
+        perceptronNet[perceptronNet.length - 1] = new Perceptron[outputPerceptronCount];
         for (int i = 0; i <= outputPerceptronCount-1; i++) { //make output layer
             perceptronNet[perceptronNet.length - 1][i] = new Perceptron((hiddenPerceptronCount[hiddenPerceptronCount.length - 1]), 1, true);
         }
@@ -65,23 +71,42 @@ public class Net {
     }
 
 
-    void transmission () { //??????????? wtf
-        for (int i = 0; i < perceptronNet.length; i++) {
-            for (Perceptron perceptron : perceptronNet[i]) {
-                if (i == 0) {
-                    for (float input : inputValue) {
-                        perceptron.setInput(input);
-                    }
-                }else if (i < perceptronNet.length-1) {
-                    for (int j = 0; j < perceptronNet[i+1].length; j++) {
-                        perceptronNet[i+1][j].setInput(perceptron.getOutput().get(j));
-                    }
-                } else {
-                    for (int j = 0; j <= perceptronNet[i].length; j++) {
-                        outputValue.addAll(perceptron.getOutput());
-                    }
+//    void transmission () { //??????????? wtf
+//        for (int i = 0; i < perceptronNet.length; i++) {
+//            for (Perceptron perceptron : perceptronNet[i]) {
+//                if (i == 0) {
+//                    for (float input : inputValue) {
+//                        perceptron.setInput(input);
+//                    }
+//                }else if (i < perceptronNet.length-1) {
+//                    for (int j = 0; j < perceptronNet[i+1].length; j++) {
+//                        System.out.println(i+"  "+j);
+//                        perceptronNet[i+1][j].setInput(perceptron.getOutput().get(j));
+//                    }
+//                } else {
+//                    for (int j = 0; j <= perceptronNet[i].length; j++) {
+//                        outputValue.addAll(perceptron.getOutput());
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    void transmission () {
+        for (int i = 0; i <= perceptronNet[0].length-1; i++) {
+            for (float input : inputValue) {
+                perceptronNet[0][i].setInput(input);
+            }
+        }
+        for (int i = 1; i <= perceptronNet.length-2; i++) {
+            for (int j = 0; j <= perceptronNet[i].length-1; j++ ) {
+                for (int k = 0; k <= perceptronNet[i - 1].length - 1; k++) {
+                    perceptronNet[i][j].setInput(perceptronNet[i - 1][k].getOutput().get(j));
                 }
             }
+        }
+        for (int i = 0; i<= perceptronNet[perceptronNet.length-1].length-1; i++) {
+            outputValue.addAll(perceptronNet[perceptronNet.length-1][i].getOutput());
         }
     }
 
