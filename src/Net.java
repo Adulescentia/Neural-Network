@@ -7,7 +7,7 @@ public class Net {
     ArrayList<Float> targetOutputValue;
 
     ArrayList<Float> errorSignal;
-    ArrayList<Float>[] errorGradient;
+    float[][] errorGradient;
     float[][][] weightOfWeight;
 
     Float sumOfTheSquaredErrors;
@@ -24,9 +24,12 @@ public class Net {
         this.targetOutputValue = targetOutputValue;
 
         errorSignal = new ArrayList<>();
-        errorGradient = new ArrayList[hiddenPerceptronCount.length + 1];
+        errorGradient = new float[hiddenPerceptronCount.length + 1][]; // hidden + output
 
-
+        //error gradient initializer
+        for (int i = 0; i <= errorGradient.length-1; i++) {
+            errorGradient[i] = new float[perceptronNet[i+1].length];
+        }
 
         //make input layer
         perceptronNet[0] = new Perceptron[inputPerceptronCount];
@@ -70,28 +73,6 @@ public class Net {
         }
     }
 
-
-//    void transmission () { //??????????? wtf
-//        for (int i = 0; i < perceptronNet.length; i++) {
-//            for (Perceptron perceptron : perceptronNet[i]) {
-//                if (i == 0) {
-//                    for (float input : inputValue) {
-//                        perceptron.setInput(input);
-//                    }
-//                }else if (i < perceptronNet.length-1) {
-//                    for (int j = 0; j < perceptronNet[i+1].length; j++) {
-//                        System.out.println(i+"  "+j);
-//                        perceptronNet[i+1][j].setInput(perceptron.getOutput().get(j));
-//                    }
-//                } else {
-//                    for (int j = 0; j <= perceptronNet[i].length; j++) {
-//                        outputValue.addAll(perceptron.getOutput());
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     void transmission () {
         for (int i = 0; i <= perceptronNet[0].length-1; i++) {
             for (float input : inputValue) {
@@ -122,18 +103,28 @@ public class Net {
         }
     }
 
-    void updateOutputLayerErrorGradient() {
+    void updateHiddenErrorGradient() {
+//        for (int i = 0; i <= errorGradient.length-1; i++) {
+//            for (int j = 0; j <= errorGradient[i].length-1; j++) {
+//                errorGradient[i][j] =
+//                        (float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))*
+//                        (1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))))*errorSignal.get(i)));
+//            }
+//        } todo 수정 - 출력층 기준으로 작성함
+    }
+    void updateOutputErrorGradient() {
         for(int i = 0; i<=perceptronNet[perceptronNet.length-1].length-1; i++) {
-            errorGradient[perceptronNet.length-2].add(
+            errorGradient[errorGradient.length-1][i] =
                     (float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))*
-                    (1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))))*errorSignal.get(i)));
+                    (1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))))*errorSignal.get(i));
         }
     }
 
-    void updateOutputLayerWeight() {
+    void updateWeight() {
         for(int i = 0; i<= perceptronNet[perceptronNet.length-2].length-1; i++) {
             for(int j = 0; i<= perceptronNet[perceptronNet.length-1].length-1; i++) {
-                weightOfWeight[perceptronNet.length-2][i][j] = (Perceptron.learningRate * perceptronNet[perceptronNet.length - 2][i].output * errorGradient[perceptronNet.length-2].get(j));
+                weightOfWeight[perceptronNet.length-2][i][j] =
+                        (Perceptron.learningRate * perceptronNet[perceptronNet.length - 2][i].output * errorGradient[perceptronNet.length-2][j]);
             }
         }
         for(int i = 0; i<=perceptronNet[perceptronNet.length-2].length-1; i++) {
@@ -142,21 +133,13 @@ public class Net {
 
     }
 
-    void updateHiddenLayerWeight() {
-        //todo
-    }
-
-    void updateHiddenLayerErrorGradient() {
-        //todo
-    }
 
     void activate() {
         transmission();
         updateErrorSignal();
-        updateOutputLayerErrorGradient();
-        updateOutputLayerWeight();
-        updateHiddenLayerErrorGradient();
-        updateHiddenLayerWeight();
+        updateOutputErrorGradient();
+        updateHiddenErrorGradient();
+        updateWeight();
         epoch++;
     }
 
