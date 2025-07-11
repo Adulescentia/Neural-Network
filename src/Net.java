@@ -9,6 +9,7 @@ public class Net {
     ArrayList<Float> errorSignal;
     float[][] errorGradient;
     float[][][] weightOfWeight;
+    float hiddenErrorGradientXweight;
 
     Float sumOfTheSquaredErrors;
     int epoch = 0;
@@ -26,10 +27,7 @@ public class Net {
         errorSignal = new ArrayList<>();
         errorGradient = new float[hiddenPerceptronCount.length + 1][]; // hidden + output
 
-        //error gradient initializer
-        for (int i = 0; i <= errorGradient.length-1; i++) {
-            errorGradient[i] = new float[perceptronNet[i+1].length];
-        }
+
 
         //make input layer
         perceptronNet[0] = new Perceptron[inputPerceptronCount];
@@ -61,6 +59,11 @@ public class Net {
         perceptronNet[perceptronNet.length - 1] = new Perceptron[outputPerceptronCount];
         for (int i = 0; i <= outputPerceptronCount-1; i++) { //make output layer
             perceptronNet[perceptronNet.length - 1][i] = new Perceptron((hiddenPerceptronCount[hiddenPerceptronCount.length - 1]), 1, true);
+        }
+
+        //error gradient initializer
+        for (int i = 0; i <= errorGradient.length-1; i++) {
+            errorGradient[i] = new float[perceptronNet[i+1].length];
         }
 
         //weight grid initializer
@@ -104,13 +107,19 @@ public class Net {
     }
 
     void updateHiddenErrorGradient() {
-//        for (int i = 0; i <= errorGradient.length-1; i++) {
-//            for (int j = 0; j <= errorGradient[i].length-1; j++) {
-//                errorGradient[i][j] =
-//                        (float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))*
-//                        (1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))))*errorSignal.get(i)));
-//            }
-//        } todo 수정 - 출력층 기준으로 작성함
+        for (int i = errorGradient.length-2; i >= 0; i--) {
+            for (int j = 0; j<= errorGradient[i+1].length-1; j++) {
+                for (int k = 0; k <= perceptronNet[i+1].length-1; k++) {
+                    hiddenErrorGradientXweight += (errorGradient[i+1][j]
+                            * perceptronNet[i+1][k]
+                            .weightList.get(j));
+                }
+            }
+            for (int j = 0; j<= errorGradient[i].length-1; j++) {
+                errorGradient[i][j] =
+                        (float) ((1 / (1 + Math.exp(-1 * (perceptronNet[i][j].getSumOfInputs())))) * (1 - (1 / (1 + Math.exp(-1 * (perceptronNet[i][j].getSumOfInputs()))))) * hiddenErrorGradientXweight);
+            }
+        }
     }
     void updateOutputErrorGradient() {
         for(int i = 0; i<=perceptronNet[perceptronNet.length-1].length-1; i++) {
