@@ -20,12 +20,12 @@ public class Perceptron {
         inputList = new ArrayList<>();
         calculatedOutputList = new ArrayList<>();
         if (!isOutputLayer) {
-            for (int i = 0; i <= outputCount; i++) { //weight initializing
+            for (int i = 0; i <= outputCount-1; i++) { //weight initializing
                 // TO-DO 각 활성화 함수에 맞는 초기화 함수 사용 https://wikidocs.net/259052  - 현재는 He initializing
                 weightList.add((float) (random.nextDouble((2 * Math.sqrt((double) 6 / inputCount))) - Math.sqrt((double) 6 / inputCount))); //일단은 ReLU 용
             }
         } else {
-            for (int i = 0; i <= outputCount; i++) {
+            for (int i = 0; i <= outputCount-1; i++) {
                 weightList.add(1F);
             }
         }
@@ -34,12 +34,12 @@ public class Perceptron {
 
     void calculate() {
         output = 0;
+        calculatedOutputList.clear();
         for (float input : inputList) {
             output += input;
         }
         output -= bias;
         for (float weight : weightList) {
-//            System.out.println(activate(output * weight));
             calculatedOutputList.add(activate(output * weight));
         }
     }
@@ -77,7 +77,9 @@ public class Perceptron {
         weightList.set(index, weightOfWeight);
     }
     float getWeight(int index) {
+        System.out.println(weightList.get(index));
         return weightList.get(index);
+
     }
     public float activate(float value) {
         return activationFunction.apply(value);

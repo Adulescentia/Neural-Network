@@ -136,14 +136,9 @@ public class Net {
     void updateWeight() {
         for(int i = 0; i <= perceptronNet.length-2; i++) {
             for(int j = 0; j <= perceptronNet[i].length-1; j++) {
-                for(int k = 0; k<= perceptronNet[i+1].length-1; k++) {
-                    System.out.println(i +"  "+j +"  " + k); //todo delete
-                    weightOfWeight = perceptronNet[i][j]
-                            .getWeight(k)//todo error here
-                            + learningRate*perceptronNet[i][j].output
-                            * errorGradient[i][j];
+                for(int k = 0; k <= perceptronNet[i+1].length-1; k++) {
+                    weightOfWeight = perceptronNet[i][j].getWeight(k) + learningRate*perceptronNet[i][j].output * errorGradient[i][k];
                     perceptronNet[i][j].updateWeight(k, weightOfWeight);
-                    //todo - get(k) 에서 outofbounds 뜸??????????
                }
             }
         }
@@ -181,20 +176,20 @@ public class Net {
         while (true) {
             if (true) { //허용범위
 //                break;
-//                transmission();
-//                updateErrorSignal();
-//                updateOutputErrorGradient();
-//                updateHiddenErrorGradient();
-//                updateWeight();
-//                printResult();
-//
-//                epoch++;
-//                outputValue.clear();
-//                for (Perceptron[] layer : perceptronNet) {
-//                    for (Perceptron perceptron : layer) {
-//                        perceptron.reset();
-//                    }
-//                }
+                transmission();
+                updateErrorSignal();
+                updateOutputErrorGradient();
+                updateHiddenErrorGradient();
+                updateWeight();
+                printResult();
+
+                epoch++;
+                outputValue.clear();
+                for (Perceptron[] layer : perceptronNet) {
+                    for (Perceptron perceptron : layer) {
+                        perceptron.reset();
+                    }
+                }
             } else {
 
             }
