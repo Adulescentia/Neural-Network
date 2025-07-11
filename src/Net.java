@@ -8,8 +8,9 @@ public class Net {
 
     ArrayList<Float> errorSignal;
     float[][] errorGradient;
-    float[][][] weightOfWeight;
+    float weightOfWeight;
     float hiddenErrorGradientXweight;
+    float learningRate;
 
     Float sumOfTheSquaredErrors;
     int epoch = 1;
@@ -18,7 +19,7 @@ public class Net {
         perceptronNet = new Perceptron[1 + hiddenPerceptronCount.length + 1][]; //input, hidden, output
 
         Perceptron.functionType = functionType;
-        Perceptron.learningRate = learningRate;
+        this.learningRate = learningRate;
 
         this.inputValue = inputValue;
         this.outputValue = new ArrayList<>();
@@ -66,14 +67,14 @@ public class Net {
             errorGradient[i] = new float[perceptronNet[i+1].length];
         }
 
-        //weight grid initializer
-        weightOfWeight = new float[1 + hiddenPerceptronCount.length][][];
-        for (int i = 0; i <= perceptronNet.length - 2; i++) {
-            weightOfWeight[i] = new float[perceptronNet[i].length][];
-            for (int j = 0; j <= perceptronNet[i].length-1; j++) {
-                weightOfWeight[i][j] = new float[perceptronNet[i+1].length];
-            }
-        }
+//        //weight grid initializer
+//        weightOfWeight = new float[1 + hiddenPerceptronCount.length][][];
+//        for (int i = 0; i <= perceptronNet.length - 2; i++) {
+//            weightOfWeight[i] = new float[perceptronNet[i].length][];
+//            for (int j = 0; j <= perceptronNet[i].length-1; j++) {
+//                weightOfWeight[i][j] = new float[perceptronNet[i+1].length];
+//            }
+//        }
     }
 
     void transmission () {
@@ -115,8 +116,10 @@ public class Net {
                             .weightList.get(j));
                 }
             }
-            for (int j = 0; j<= errorGradient[i].length-1; j++) {
-                errorGradient[i][j] =
+            for (int j = 0; j<= errorGradient[i].length-1; j++) { //todo 은닉층 2개 이상이면 에러뜸
+                errorGradient[i]
+                        [j] = //todo Index 1 out of bounds for length 1
+                        // 이번엔 또 오류 안뜨네???????????????????? 뭐가 문제인거임
                         (float) ((1 / (1 + Math.exp(-1 * (perceptronNet[i][j].getSumOfInputs())))) * (1 - (1 / (1 + Math.exp(-1 * (perceptronNet[i][j].getSumOfInputs()))))) * hiddenErrorGradientXweight);
             }
         }
@@ -131,16 +134,19 @@ public class Net {
     }
 
     void updateWeight() {
-        for (int i = 0; i <= perceptronNet[perceptronNet.length - 2].length - 1; i++) {
-            for (int j = 0; i <= perceptronNet[perceptronNet.length - 1].length - 1; i++) {
-                weightOfWeight[perceptronNet.length - 2][i][j] =
-                        (Perceptron.learningRate * perceptronNet[perceptronNet.length - 2][i].output * errorGradient[perceptronNet.length - 2][j]);
+        for(int i = 0; i <= perceptronNet.length-2; i++) {
+            for(int j = 0; j <= perceptronNet[i].length-1; j++) {
+                for(int k = 0; k<= perceptronNet[i+1].length-1; k++) {
+                    System.out.println(i +"  "+j +"  " + k); //todo delete
+                    weightOfWeight = perceptronNet[i][j]
+                            .getWeight(k)//todo error here
+                            + learningRate*perceptronNet[i][j].output
+                            * errorGradient[i][j];
+                    perceptronNet[i][j].updateWeight(k, weightOfWeight);
+                    //todo - get(k) 에서 outofbounds 뜸??????????
+               }
             }
         }
-        for (int i = 0; i <= perceptronNet[perceptronNet.length - 2].length - 1; i++) {
-            perceptronNet[perceptronNet.length - 2][i].updateWeight(weightOfWeight[perceptronNet.length - 2][i]);
-        }
-
     }
 
     void printResult() { //dummy?
@@ -174,7 +180,21 @@ public class Net {
 
         while (true) {
             if (true) { //허용범위
-                break;
+//                break;
+//                transmission();
+//                updateErrorSignal();
+//                updateOutputErrorGradient();
+//                updateHiddenErrorGradient();
+//                updateWeight();
+//                printResult();
+//
+//                epoch++;
+//                outputValue.clear();
+//                for (Perceptron[] layer : perceptronNet) {
+//                    for (Perceptron perceptron : layer) {
+//                        perceptron.reset();
+//                    }
+//                }
             } else {
 
             }

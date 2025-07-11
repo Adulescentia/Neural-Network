@@ -9,25 +9,23 @@ public class Perceptron {
     Random random = new Random();
     static int functionType;
     private final ActivationFunction activationFunction;
-    static float learningRate;
     float bias;
     float output;
     ArrayList<Float> inputList;
     float sumOfInputs = 0;
     ArrayList<Float> calculatedOutputList;
-    ArrayList<Float> weightList;
+    ArrayList<Float> weightList = new ArrayList<>();;
 
     Perceptron(int inputCount, int outputCount, boolean isOutputLayer) {
         inputList = new ArrayList<>();
         calculatedOutputList = new ArrayList<>();
-        weightList = new ArrayList<>();
         if (!isOutputLayer) {
-            for (int i = 0; i < outputCount; i++) { //weight initializing
+            for (int i = 0; i <= outputCount; i++) { //weight initializing
                 // TO-DO 각 활성화 함수에 맞는 초기화 함수 사용 https://wikidocs.net/259052  - 현재는 He initializing
                 weightList.add((float) (random.nextDouble((2 * Math.sqrt((double) 6 / inputCount))) - Math.sqrt((double) 6 / inputCount))); //일단은 ReLU 용
             }
         } else {
-            for (int i = 0; i < outputCount; i++) {
+            for (int i = 0; i <= outputCount; i++) {
                 weightList.add(1F);
             }
         }
@@ -75,10 +73,11 @@ public class Perceptron {
         }
         return sumOfInputs;
     }
-    void updateWeight(float[] weightOfWeight) {
-        for(int i = 0; i <= weightList.size()-1; i++) {
-            weightList.set(i,weightList.get(i) + weightOfWeight[i]);
-        }
+    void updateWeight(int index, float weightOfWeight) {
+        weightList.set(index, weightOfWeight);
+    }
+    float getWeight(int index) {
+        return weightList.get(index);
     }
     public float activate(float value) {
         return activationFunction.apply(value);

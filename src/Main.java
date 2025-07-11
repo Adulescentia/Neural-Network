@@ -26,7 +26,7 @@ public class Main {
         activationFunctionType = scanner.nextInt();
 
         //set learning rate
-        System.out.println("Please enter learning rate (float)");
+        System.out.println("Please enter learning rate (0.1 recommended)");
         learningRate = scanner.nextFloat();
 
         //make inputLayer's perceptron
@@ -47,6 +47,6 @@ public class Main {
 
         Net net = new Net(activationFunctionType, learningRate, inputPerceptronCount, hiddenPerceptronCount, outputPerceptronCount, new ArrayList<Float>(List.of(dummyInputData.getElement())), new ArrayList<Float>(List.of(dummyTargetData.getElement())));
         net.activate();
-        
+
     }
 }
