@@ -47,6 +47,6 @@ public class Main {
 
         Net net = new Net(activationFunctionType, learningRate, inputPerceptronCount, hiddenPerceptronCount, outputPerceptronCount, new ArrayList<Float>(List.of(dummyInputData.getElement())), new ArrayList<Float>(List.of(dummyTargetData.getElement())));
         net.activate();
-        net.printResult();
+        
     }
 }
