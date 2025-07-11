@@ -108,9 +108,11 @@ public class Net {
     }
 
     void updateHiddenErrorGradient() {
+
         for (int i = errorGradient.length-2; i >= 0; i--) {
             for (int j = 0; j<= errorGradient[i+1].length-1; j++) {
                 for (int k = 0; k <= perceptronNet[i+1].length-1; k++) {
+                    hiddenErrorGradientXweight = 0;
                     hiddenErrorGradientXweight += (errorGradient[i+1][j]
                             * perceptronNet[i+1][k]
                             .weightList.get(j));
@@ -138,7 +140,7 @@ public class Net {
             for(int j = 0; j <= perceptronNet[i].length-1; j++) {
                 for(int k = 0; k <= perceptronNet[i+1].length-1; k++) {
                     weightOfWeight = perceptronNet[i][j].getWeight(k) + learningRate*perceptronNet[i][j].output * errorGradient[i][k];
-                    perceptronNet[i][j].updateWeight(k, weightOfWeight);
+                    perceptronNet[i][j].updateWeight(k, weightOfWeight-0.0007F);
                }
             }
         }
@@ -158,40 +160,42 @@ public class Net {
     }
 
     void activate() {
-        transmission();
-        updateErrorSignal();
-        updateOutputErrorGradient();
-        updateHiddenErrorGradient();
-        updateWeight();
-        printResult();
 
-        epoch++;
-        outputValue.clear();
-        for (Perceptron[] layer : perceptronNet) {
-            for (Perceptron perceptron : layer) {
-                perceptron.reset();
-            }
-        }
+//        while (true) {
+//            if (true) { //허용범위
+////                break;
+//                transmission();
+//                updateErrorSignal();
+//                updateOutputErrorGradient();
+//                updateHiddenErrorGradient();
+//                updateWeight();
+//                printResult();
+//
+//                epoch++;
+//                outputValue.clear();
+//                for (Perceptron[] layer : perceptronNet) {
+//                    for (Perceptron perceptron : layer) {
+//                        perceptron.reset();
+//                    }
+//                }
+//            } else {
+//
+//            }
+//        }
+        for(int i = 0; i<=100; i++) {
+            transmission();
+            updateErrorSignal();
+            updateOutputErrorGradient();
+            updateHiddenErrorGradient();
+            updateWeight();
+            printResult();
 
-        while (true) {
-            if (true) { //허용범위
-//                break;
-                transmission();
-                updateErrorSignal();
-                updateOutputErrorGradient();
-                updateHiddenErrorGradient();
-                updateWeight();
-                printResult();
-
-                epoch++;
-                outputValue.clear();
-                for (Perceptron[] layer : perceptronNet) {
-                    for (Perceptron perceptron : layer) {
-                        perceptron.reset();
-                    }
+            epoch++;
+            outputValue.clear();
+            for (Perceptron[] layer : perceptronNet) {
+                for (Perceptron perceptron : layer) {
+                    perceptron.reset();
                 }
-            } else {
-
             }
         }
     }

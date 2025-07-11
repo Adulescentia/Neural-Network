@@ -22,7 +22,8 @@ public class Perceptron {
         if (!isOutputLayer) {
             for (int i = 0; i <= outputCount-1; i++) { //weight initializing
                 // TO-DO 각 활성화 함수에 맞는 초기화 함수 사용 https://wikidocs.net/259052  - 현재는 He initializing
-                weightList.add((float) (random.nextDouble((2 * Math.sqrt((double) 6 / inputCount))) - Math.sqrt((double) 6 / inputCount))); //일단은 ReLU 용
+//                weightList.add((float) (random.nextDouble((2 * Math.sqrt((double) 6 / inputCount))) - Math.sqrt((double) 6 / inputCount))); //일단은 ReLU 용
+                weightList.add((float) (random.nextDouble() * Math.sqrt(2.0 / inputCount)));
             }
         } else {
             for (int i = 0; i <= outputCount-1; i++) {
@@ -68,6 +69,7 @@ public class Perceptron {
     }
 
     float getSumOfInputs() {
+        sumOfInputs = 0;
         for (float input : inputList) {
             sumOfInputs += input;
         }
