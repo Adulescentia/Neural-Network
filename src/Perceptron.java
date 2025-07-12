@@ -15,41 +15,33 @@ public class Perceptron {
     float sumOfInputs = 0;
     ArrayList<Float> calculatedOutputList;
     ArrayList<Float> weightList = new ArrayList<>();;
-
+    boolean isOutPut;
     Perceptron(int inputCount, int outputCount, boolean isOutputLayer) {
         inputList = new ArrayList<>();
         calculatedOutputList = new ArrayList<>();
-        if (!isOutputLayer) {
-            for (int i = 0; i <= outputCount-1; i++) { //weight initializing
-                // TO-DO 각 활성화 함수에 맞는 초기화 함수 사용 https://wikidocs.net/259052  - 현재는 He initializing
+        bias = random.nextFloat()-1;
+        for (int i = 0; i <= outputCount-1; i++) { //weight initializing
+            // TO-DO 각 활성화 함수에 맞는 초기화 함수 사용 https://wikidocs.net/259052  - 현재는 He initializing
 //                weightList.add((float) (random.nextDouble((2 * Math.sqrt((double) 6 / inputCount))) - Math.sqrt((double) 6 / inputCount))); //일단은 ReLU 용
-                weightList.add((float) (random.nextDouble() * Math.sqrt(2.0 / inputCount)));
-            }
-        } else {
-            for (int i = 0; i <= outputCount-1; i++) {
-                weightList.add(1F);
-            }
+//                weightList.add((float) (random.nextDouble() * Math.sqrt(2.0 / inputCount)));
+            weightList.add(random.nextFloat()*2-1);
         }
+
         this.activationFunction = selectActivationFunction(functionType);
+        this.isOutPut = isOutputLayer;
     }
 
     void calculate() {
-        output = 0;
-        calculatedOutputList.clear();
         for (float input : inputList) {
             output += input;
         }
-        output -= bias;
+//        output -= bias;
+
         for (float weight : weightList) {
             calculatedOutputList.add(activate(output * weight));
         }
     }
-
     ArrayList<Float> getOutput() {
-        calculate();
-        for (Float c : calculatedOutputList) {
-//            System.out.println("-"+c);
-        }
         return calculatedOutputList;
     }
 
@@ -75,16 +67,22 @@ public class Perceptron {
         }
         return sumOfInputs;
     }
+
     void updateWeight(int index, float weightOfWeight) {
         weightList.set(index, weightOfWeight);
     }
+    void updateBias(float Bias) {
+        bias += Bias;
+    }
+
     float getWeight(int index) {
-        System.out.println(weightList.get(index));
+        System.out.println("{"+weightList.get(index));
         return weightList.get(index);
 
     }
     public float activate(float value) {
-        return activationFunction.apply(value);
+//        return activationFunction.apply(value);
+        return (float) (1 / (1 + Math.exp(-value)));
     }
     void reset () {
         output = 0;

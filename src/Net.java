@@ -80,19 +80,26 @@ public class Net {
     void transmission () {
         for (int i = 0; i <= perceptronNet[0].length-1; i++) {
             for (float input : inputValue) {
+                System.out.println(input);
                 perceptronNet[0][i].setInput(input);
+                perceptronNet[0][i].calculate();
             }
         }
-        for (int i = 1; i <= perceptronNet.length-2; i++) {
+        for (int i = 1; i <= perceptronNet.length-1; i++) {
             for (int j = 0; j <= perceptronNet[i].length-1; j++ ) {
                 for (int k = 0; k <= perceptronNet[i - 1].length - 1; k++) {
+                    System.out.println(perceptronNet[i - 1][k].getOutput().get(j));
                     perceptronNet[i][j].setInput(perceptronNet[i - 1][k].getOutput().get(j));
+                    perceptronNet[i][j].calculate();
                 }
             }
         }
-        for (int i = 0; i<= perceptronNet[perceptronNet.length-1].length-1; i++) {
-            outputValue.addAll(perceptronNet[perceptronNet.length-1][i].getOutput());
-        }
+
+//        for (int i = 0; i<= perceptronNet[perceptronNet.length-1].length-1; i++) {
+//            System.out.println(perceptronNet[perceptronNet.length-1][i].calculatedOutputList);
+//            perceptronNet[perceptronNet.length-1][i].calculate();
+//            outputValue.addAll(perceptronNet[perceptronNet.length-1][i].calculatedOutputList);
+//        }
     }
 
     void updateErrorSignal() {
@@ -103,7 +110,7 @@ public class Net {
 //            System.out.println(i);
         }
         for(int i = 0; i<=perceptronNet[perceptronNet.length-1].length-1; i++) {
-            errorSignal.add(targetOutputValue.get(i) - outputValue.get(i));
+            errorSignal.add(targetOutputValue.get(i) - perceptronNet[perceptronNet.length-1][i].calculatedOutputList.getFirst());
         }
     }
 
@@ -135,13 +142,35 @@ public class Net {
         }
     }
 
-    void updateWeight() {
+    void updateHiddenWeight() {
+        for(int i = 0; i <= perceptronNet.length-3; i++) {
+            for(int j = 0; j <= perceptronNet[i].length-1; j++) {
+                for(int k = 0; k <= perceptronNet[i+1].length-1; k++) {
+                    weightOfWeight = perceptronNet[i][j].getWeight(k) + learningRate*perceptronNet[i][j].calculatedOutputList.get(k) * errorGradient[i][k];
+                    System.out.println("{}{}"+perceptronNet[i][j].output);
+                    perceptronNet[i][j].updateWeight(k, weightOfWeight);
+               }
+            }
+        }
+    }
+
+    void updateOutputWeight() {
+        for(int j = 0; j <= perceptronNet[perceptronNet.length-2].length-1; j++) {
+            for(int k = 0; k <= perceptronNet[perceptronNet.length-1].length-1; k++) {
+                System.out.println("{}{}{}"+(perceptronNet[perceptronNet.length-2][j].calculatedOutputList.get(k) ));//이새끼 0이네?
+                weightOfWeight = perceptronNet[perceptronNet.length-2][j].getWeight(k) + (learningRate*perceptronNet[perceptronNet.length-2][j].calculatedOutputList.get(k) * errorGradient[perceptronNet.length-2][k]);
+
+                perceptronNet[perceptronNet.length-2][j].updateWeight(k, weightOfWeight);
+            }
+        }
+    }
+
+    void updateBias () {
         for(int i = 0; i <= perceptronNet.length-2; i++) {
             for(int j = 0; j <= perceptronNet[i].length-1; j++) {
                 for(int k = 0; k <= perceptronNet[i+1].length-1; k++) {
-                    weightOfWeight = perceptronNet[i][j].getWeight(k) + learningRate*perceptronNet[i][j].output * errorGradient[i][k];
-                    perceptronNet[i][j].updateWeight(k, weightOfWeight-0.0007F);
-               }
+                    perceptronNet[i][j].updateBias(learningRate*-1*errorGradient[i][k]);
+                }
             }
         }
     }
@@ -153,8 +182,8 @@ public class Net {
             System.out.print(targetOutput + ", ");
         }
         System.out.print("\n-------output is:");
-        for (Float output : outputValue) {
-            System.out.print(output + ", ");
+        for (Perceptron output : perceptronNet[perceptronNet.length-1]) {
+            System.out.print(output.calculatedOutputList.getFirst() + ", ");
         }
         System.out.println();
     }
@@ -182,12 +211,14 @@ public class Net {
 //
 //            }
 //        }
-        for(int i = 0; i<=100; i++) {
+        for(int i = 0; i<=3000; i++) {
             transmission();
             updateErrorSignal();
             updateOutputErrorGradient();
+            updateOutputWeight();
             updateHiddenErrorGradient();
-            updateWeight();
+            updateHiddenWeight();
+            updateBias();
             printResult();
 
             epoch++;
