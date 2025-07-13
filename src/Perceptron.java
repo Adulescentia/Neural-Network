@@ -35,10 +35,16 @@ public class Perceptron {
         for (float input : inputList) {
             output += input;
         }
-//        output -= bias;
-
+        output -= bias;
+        if (isOutPut) {
+            System.out.println(output);
+        }
         for (float weight : weightList) {
-            calculatedOutputList.add(activate(output * weight));
+            if (isOutPut) {
+                calculatedOutputList.add(activate(output));
+            } else {
+                calculatedOutputList.add(activate(output) * weight);
+            }
         }
     }
     ArrayList<Float> getOutput() {
@@ -70,6 +76,7 @@ public class Perceptron {
 
     void updateWeight(int index, float weightOfWeight) {
         weightList.set(index, weightList.get(index) + weightOfWeight);
+//        System.out.println("uPW  "+weightList.get(index) + weightOfWeight);
     }
     void updateBias(float Bias) {
         bias += Bias;
