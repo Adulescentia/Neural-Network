@@ -69,7 +69,7 @@ public class Perceptron {
     }
 
     void updateWeight(int index, float weightOfWeight) {
-        weightList.set(index, weightOfWeight);
+        weightList.set(index, weightList.get(index) + weightOfWeight);
     }
     void updateBias(float Bias) {
         bias += Bias;

@@ -8,9 +8,11 @@ public class Net {
 
     ArrayList<Float> errorSignal;
     float[][] errorGradient;
-    float weightOfWeight;
+    float[][][] weightOfWeight;
+    float[][] weightOfBias;
     float hiddenErrorGradientXweight;
     float learningRate;
+
 
     Float sumOfTheSquaredErrors;
     int epoch = 1;
@@ -67,14 +69,20 @@ public class Net {
             errorGradient[i] = new float[perceptronNet[i+1].length];
         }
 
-//        //weight grid initializer
-//        weightOfWeight = new float[1 + hiddenPerceptronCount.length][][];
-//        for (int i = 0; i <= perceptronNet.length - 2; i++) {
-//            weightOfWeight[i] = new float[perceptronNet[i].length][];
-//            for (int j = 0; j <= perceptronNet[i].length-1; j++) {
-//                weightOfWeight[i][j] = new float[perceptronNet[i+1].length];
-//            }
-//        }
+        //weight grid initializer
+        weightOfWeight = new float[1 + hiddenPerceptronCount.length][][];
+        for (int i = 0; i <= perceptronNet.length - 2; i++) {
+            weightOfWeight[i] = new float[perceptronNet[i].length][];
+            for (int j = 0; j <= perceptronNet[i].length-1; j++) {
+                weightOfWeight[i][j] = new float[perceptronNet[i+1].length];
+            }
+        }
+
+        //bias grid initializer
+        weightOfBias = new float[hiddenPerceptronCount.length + 1][];
+        for(int i = 0; i <= weightOfBias.length-1; i++) {
+            weightOfBias[i] = new float[perceptronNet[i+1].length];
+        }
     }
 
     void transmission () {
@@ -114,6 +122,14 @@ public class Net {
         }
     }
 
+    void updateOutputErrorGradient() {
+        for(int i = 0; i<=perceptronNet[perceptronNet.length-1].length-1; i++) {
+            errorGradient[errorGradient.length-1][i] =
+                    (float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))*
+                            (1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))))*errorSignal.get(i));
+        }
+    }
+
     void updateHiddenErrorGradient() {
 
         for (int i = errorGradient.length-2; i >= 0; i--) {
@@ -134,33 +150,68 @@ public class Net {
         }
     }
 
-    void updateOutputErrorGradient() {
-        for(int i = 0; i<=perceptronNet[perceptronNet.length-1].length-1; i++) {
-            errorGradient[errorGradient.length-1][i] =
-                    (float) (1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))*
-                    (1-(1/(1+Math.exp(-perceptronNet[perceptronNet.length-1][i].sumOfInputs))))*errorSignal.get(i));
+    void setOutputWeightOfWeight() {
+        for(int i = 0; i <= weightOfWeight[weightOfWeight.length-1].length-1; i++) {
+            for(int j = 0; j <= weightOfWeight[weightOfWeight.length-1][i].length-1; j++) {
+                weightOfWeight[weightOfWeight.length-1][i][j] = learningRate*perceptronNet[perceptronNet.length-2][i].calculatedOutputList.get(j) * errorGradient[perceptronNet.length-2][j];
+            }
         }
     }
 
-    void updateHiddenWeight() {
-        for(int i = 0; i <= perceptronNet.length-3; i++) {
-            for(int j = 0; j <= perceptronNet[i].length-1; j++) {
-                for(int k = 0; k <= perceptronNet[i+1].length-1; k++) {
-                    weightOfWeight = perceptronNet[i][j].getWeight(k) + learningRate*perceptronNet[i][j].calculatedOutputList.get(k) * errorGradient[i][k];
-                    System.out.println("{}{}"+perceptronNet[i][j].output);
-                    perceptronNet[i][j].updateWeight(k, weightOfWeight);
+    void setHiddenWeightOfWeight() {
+        for(int i = 0; i <= weightOfWeight.length-2; i++) {
+            for(int j = 0; j <= weightOfWeight[i].length-1; j++) {
+                for(int k = 0; k <= weightOfWeight[i+1].length-1; k++) {
+                    weightOfWeight[i][j][k] = learningRate*perceptronNet[i][j].calculatedOutputList.get(k) * errorGradient[i][k];
                }
             }
         }
     }
 
-    void updateOutputWeight() {
-        for(int j = 0; j <= perceptronNet[perceptronNet.length-2].length-1; j++) {
-            for(int k = 0; k <= perceptronNet[perceptronNet.length-1].length-1; k++) {
-                System.out.println("{}{}{}"+(perceptronNet[perceptronNet.length-2][j].calculatedOutputList.get(k) ));//이새끼 0이네?
-                weightOfWeight = perceptronNet[perceptronNet.length-2][j].getWeight(k) + (learningRate*perceptronNet[perceptronNet.length-2][j].calculatedOutputList.get(k) * errorGradient[perceptronNet.length-2][k]);
+    void setOutputBias() {
+        for(int i = 0; i <= perceptronNet[perceptronNet.length-1].length-1; i++) {
+            weightOfBias[weightOfBias.length-1][i] = -1 * learningRate * errorGradient[perceptronNet.length-2][i];
+        }
+    }
 
-                perceptronNet[perceptronNet.length-2][j].updateWeight(k, weightOfWeight);
+    void setHiddenBias() {
+        for(int i = 1; i <= perceptronNet.length-2; i++) {
+            for(int j = 0; j <= perceptronNet[i].length-1; j++) {
+                weightOfBias[i][j] = -1 * learningRate * errorGradient[i][j];
+            }
+        }
+    }
+
+
+
+//    void updateHiddenWeight() {
+//        for(int i = 0; i <= perceptronNet.length-3; i++) {
+//            for(int j = 0; j <= perceptronNet[i].length-1; j++) {
+//                for(int k = 0; k <= perceptronNet[i+1].length-1; k++) {
+//                    weightOfWeight = perceptronNet[i][j].getWeight(k) + learningRate*perceptronNet[i][j].calculatedOutputList.get(k) * errorGradient[i][k];
+//                    System.out.println("{}{}"+perceptronNet[i][j].output);
+//                    perceptronNet[i][j].updateWeight(k, weightOfWeight);
+//               }
+//            }
+//        }
+//    }
+//
+//    void updateOutputWeight() {
+//        for(int j = 0; j <= perceptronNet[perceptronNet.length-2].length-1; j++) {
+//            for(int k = 0; k <= perceptronNet[perceptronNet.length-1].length-1; k++) {
+//                System.out.println("{}{}{}"+(perceptronNet[perceptronNet.length-2][j].calculatedOutputList.get(k) ));//이새끼 0이네?
+//                weightOfWeight = perceptronNet[perceptronNet.length-2][j].getWeight(k) + (learningRate*perceptronNet[perceptronNet.length-2][j].calculatedOutputList.get(k) * errorGradient[perceptronNet.length-2][k]);
+//
+//                perceptronNet[perceptronNet.length-2][j].updateWeight(k, weightOfWeight);
+//            }
+//        }
+//    }
+    void updateWeight() {
+        for(int i = 0; i<=weightOfWeight.length-1; i++) {
+            for(int j = 0; j<=weightOfWeight[i].length-1; j++) {
+                for(int k = 0; k<= weightOfWeight[i][j].length-1; k++) {
+                    perceptronNet[i][j].updateWeight(k,weightOfWeight[i][j][k]);
+                }
             }
         }
     }
@@ -214,11 +265,18 @@ public class Net {
         for(int i = 0; i<=3000; i++) {
             transmission();
             updateErrorSignal();
+
             updateOutputErrorGradient();
-            updateOutputWeight();
+            setOutputWeightOfWeight();
+            setOutputBias();
+
             updateHiddenErrorGradient();
-            updateHiddenWeight();
+            setHiddenWeightOfWeight();
+            setHiddenBias();
+
+            updateWeight();
             updateBias();
+
             printResult();
 
             epoch++;
